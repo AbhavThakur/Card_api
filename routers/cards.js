@@ -13,10 +13,13 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/:cardNumber', async (req, res) => {
-    const cardList = await Card.findById(req.params.cardNumber);
+    const cardList = await Card.find({ cardNumber: req.params.cardNumber });
 
-    if (!cardList)
-        res.status(500).json({ success: false, msg: "Card with given number not found" })
+    if (!cardList) {
+        console.log(cardList)
+        res.send("Card with given number not found")
+    }
+    console.log("card", cardList)
 
     res.status(200).send(cardList);
 })
