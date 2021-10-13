@@ -62,8 +62,10 @@ app.put('/api/v1/cardDetails/:id', async (req, res) => {
 app.get("/api/v1/cardDetails/userStatus/:contactNumber", async (req, res) => {
 
     const existCard = await Card.exists({ contactNumber: req.params.contactNumber });
+    const cardList = await Card.find({ contactNumber: req.params.contactNumber });
+
     if (existCard) {
-        return res.status(400).json({ msg: "success", userStatus: "user exists" }) // user exists=>put request
+        return res.status(400).json({ msg: "success", userStatus: "user exists", id: cardList[0].id }) // user exists=>put request
 
     }
     return res.status(400).json({ msg: "fail", userStatus: "user not exists" }) // user not exists=>post request
