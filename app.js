@@ -60,6 +60,7 @@ app.put('/api/v1/cardDetails/:id', async (req, res) => {
 })
 
 app.post("/api/v1/cardDetails", async (req, res) => {
+
     let card = new Card({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -73,13 +74,21 @@ app.post("/api/v1/cardDetails", async (req, res) => {
         subscription: req.body.subscription
     })
 
-    card = await card.save();
-
-    if (!card) {
-        return res.status(400).send("The card cant be created")
+    const existCard = await Card.exists({ cardNumber: req.body.cardNumber });
+    if (existCard) {
+        return res.status(400).send("User exists")
+        console.log(existCard);
     }
 
-    res.send(card);
+    else {
+        card = await card.save();
+
+        if (!card) {
+            return res.status(400).send("The card cant be created")
+        }
+
+        res.send(card);
+    }
 })
 
 mongoose.connect(process.env.CONNECTION_STRING, {
