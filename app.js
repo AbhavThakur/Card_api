@@ -8,7 +8,8 @@ const morgan = require("morgan"); // morgan used for logging api requests
 // morgan shows status ,req url,time taken,method
 const mongoose = require("mongoose");
 const { Card } = require('./models/card');
-const cardsRouter = require("./routers/cards")
+const { Discount } = require("./models/discount");
+// const cardsRouter = require("./routers/cards")
 
 // another way use bodyparser
 app.use(cors());
@@ -95,6 +96,47 @@ app.post("/api/v1/cardDetails", async (req, res) => {
     }
 
     res.send(card);
+})
+
+//discount
+app.get('/api/v1/discount', async (req, res) => {
+    const discountList = await Discount.find();
+
+    if (!discountList)
+        res.status(500).json({ success: false })
+
+    res.status(200).send(discountList);
+})
+
+app.get('/api/v1/discount/:merchantId', async (req, res) => {
+    const discountList = await Discount.find({ merchantId: req.params.merchantId });
+
+    if (!discountList || discountList.length === 0) {
+        console.log(discountList);
+        return res.status(500).json({ success: false, msg: "Discount with given merchant id not found" })
+    }
+    console.log(discountList);
+    res.status(200).send(discountList);
+})
+
+
+app.post("/api/v1/discount", async (req, res) => {
+
+    let discount = new Discount({
+        merchantId: req.body.merchantId,
+        name: req.body.name,
+        amount: req.body.amount,
+        dateCreated: req.body.dateCreated,
+        cardNumber: req.body.cardNumber,
+    })
+
+    discount = await discount.save();
+
+    if (!discount) {
+        return res.status(400).send("The discount cant be given")
+    }
+
+    res.send(discount);
 })
 
 mongoose.connect(process.env.CONNECTION_STRING, {
